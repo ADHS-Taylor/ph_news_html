@@ -410,11 +410,11 @@
                 const items = Array.from(xmlDoc.querySelectorAll('item')).slice(0, 15);
                 
                 if (items.length === 0) {
-                    feedContainer.innerHTML = '<div class="loader">No critical intelligence found for this query.</div>';
-                    updateDangerMeter(0);
-                    updateSummary(0, "No significant public health events detected matching parameters.");
-                    return;
-                }
+    feedContainer.innerHTML = '<div class="loader">No critical intelligence found for this query (or proxy returned invalid XML).</div>';
+    updateDangerMeter(0);
+    document.getElementById('summary-text').innerText = "NOMINAL STATUS: No significant public health events detected matching parameters.";
+    return;
+}
 
                 let htmlContent = '';
                 let headlines = [];
