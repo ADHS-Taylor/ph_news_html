@@ -3,18 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Public Health News Terminal</title>
+    <title>PH News Terminal :: Neo-Skeuo Edition</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.cells.min.js"></script>
 
     <style>
+        /* New Palette Definition */
         :root {
-            --red: #D9534F;
-            --green: #5CB85C;
-            --orange: #F0AD4E;
-            --white: #F8F9FA;
-            --black: #1E1E1E;
+            --critical-red: #E74C3C;
+            --warm-orange: #E67E22;
+            --neon-pink: #FF69B4;
+            --neon-purple: #9B59B6;
+            --rich-brown: #3E2723; /* Dark Brown for panel border */
+            --deep-black: #121212;  /* Near Black for main panel background */
+            --composite-black: #263238; /* Slightly lighter composite for inner panels */
+            --text-off-white: #ECF0F1;
         }
 
         * {
@@ -23,6 +27,7 @@
             padding: 0;
         }
 
+        /* Vanta background container */
         #vanta-bg {
             position: fixed;
             top: 0;
@@ -33,58 +38,58 @@
         }
 
         body {
-            color: var(--black);
-            font-family: 'Helvetica Neue', Arial, sans-serif;
+            color: var(--text-off-white);
+            font-family: 'Courier New', Courier, monospace; /* Terminal font */
             display: flex;
             justify-content: center;
             padding: 20px;
             min-height: 100vh;
         }
 
+        /* Main Dashboard Panel */
         .dashboard {
             width: 100%;
             max-width: 900px;
-            background: linear-gradient(to bottom, rgba(236, 236, 236, 0.95), rgba(212, 212, 212, 0.95));
+            background-color: var(--rich-brown);
             border-radius: 12px;
             padding: 20px;
             box-shadow: 
-                inset 0 2px 3px rgba(255, 255, 255, 0.8),
-                0 10px 30px rgba(0, 0, 0, 0.8),
-                0 2px 5px rgba(0,0,0,0.5);
-            border: 2px solid #999;
-            backdrop-filter: blur(5px); 
+                inset 0 2px 3px rgba(255, 255, 255, 0.2),
+                0 10px 40px rgba(0, 0, 0, 0.9),
+                0 4px 10px rgba(0,0,0,0.7);
+            border: 4px solid #5D4037; /* Lighter brown frame */
         }
 
         h1 {
             text-align: center;
-            color: #333;
-            text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
-            margin-bottom: 20px;
+            color: var(--warm-orange);
+            text-shadow: 0 2px 0 rgba(0, 0, 0, 0.8), 0 0 10px var(--critical-red);
+            margin-bottom: 25px;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
         }
 
+        /* Skeuomorphic Inner Panels */
         .panel {
-            background: var(--white);
+            background-color: var(--deep-black);
             border-radius: 8px;
             padding: 20px;
             margin-bottom: 20px;
             box-shadow: 
-                inset 0 1px 3px rgba(0,0,0,0.1),
-                0 3px 6px rgba(0,0,0,0.2),
-                0 -1px 1px rgba(255,255,255,1);
-            border: 1px solid #ccc;
+                inset 0 3px 6px rgba(0,0,0,0.8),
+                0 2px 2px rgba(255,255,255,0.1);
+            border: 2px solid #000;
         }
 
         .panel-title {
-            font-size: 0.9em;
-            color: #666;
+            font-size: 1em;
+            color: var(--neon-pink);
             text-transform: uppercase;
             font-weight: bold;
-            margin-bottom: 10px;
-            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9);
-            border-bottom: 1px groove #ddd;
+            margin-bottom: 12px;
+            text-shadow: 0 1px 0 rgba(0, 0, 0, 0.9), 0 0 8px var(--neon-pink);
+            border-bottom: 1px groove #333;
             padding-bottom: 5px;
         }
 
@@ -102,6 +107,7 @@
             justify-content: center;
         }
 
+        /* Dark/Neon Inputs */
         .input-group {
             display: flex;
             flex-direction: column;
@@ -109,55 +115,89 @@
         }
 
         label {
-            font-size: 0.85em;
+            font-size: 0.9em;
             font-weight: bold;
-            color: #444;
+            color: var(--text-off-white);
         }
 
         input[type="text"] {
             padding: 12px;
             font-size: 16px;
-            background: #fdfdfd;
-            border: 1px solid #aaa;
+            background: #000;
+            border: 2px solid #444;
             border-radius: 4px;
-            box-shadow: inset 0 3px 5px rgba(0,0,0,0.2), 0 1px 0 rgba(255,255,255,1);
+            box-shadow: inset 0 3px 5px rgba(0,0,0,0.9);
             outline: none;
-            color: #333;
+            color: var(--neon-purple);
             transition: all 0.2s;
+            font-family: inherit;
         }
 
         input[type="text"]:focus {
-            background: #fff;
-            border-color: var(--orange);
-            box-shadow: inset 0 3px 5px rgba(0,0,0,0.1), 0 0 5px rgba(240, 173, 78, 0.5);
+            border-color: var(--neon-pink);
+            box-shadow: inset 0 3px 5px rgba(0,0,0,0.5), 0 0 10px rgba(255, 105, 180, 0.5);
         }
 
+        /* Neon Slider */
+        .skeuo-slider-container {
+            margin-top: 5px;
+            margin-bottom: 10px;
+        }
+
+        .skeuo-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 10px;
+            background: #000;
+            border-radius: 5px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,1);
+            outline: none;
+            margin-top: 8px;
+            border: 1px solid #333;
+        }
+
+        .skeuo-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #fff, var(--warm-orange));
+            box-shadow: 0 0 15px var(--critical-red), 0 2px 4px rgba(0,0,0,0.8);
+            border: 2px solid #000;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        /* Composite Buttons */
         button {
             padding: 12px;
             font-size: 16px;
             font-weight: bold;
-            color: white;
+            color: #000;
             text-transform: uppercase;
-            background: linear-gradient(to bottom, #62c462, var(--green));
-            border: 1px solid #4cae4c;
+            /* Orange/Pink gradient */
+            background: linear-gradient(to bottom, var(--neon-pink), var(--warm-orange));
+            border: 2px solid #000;
             border-radius: 6px;
             cursor: pointer;
-            text-shadow: 0 -1px 0 rgba(0,0,0,0.3);
             box-shadow: 
                 inset 0 1px 0 rgba(255,255,255,0.4),
-                0 4px 0 #449d44,
-                0 6px 10px rgba(0,0,0,0.3);
+                0 4px 0 #935116, /* Darker orange for depth */
+                0 6px 12px rgba(0,0,0,0.7);
             transition: all 0.1s;
+            font-family: inherit;
         }
 
         button:active {
             transform: translateY(4px);
             box-shadow: 
-                inset 0 2px 3px rgba(0,0,0,0.3),
-                0 0 0 #449d44,
-                0 2px 2px rgba(0,0,0,0.2);
+                inset 0 2px 3px rgba(0,0,0,0.6),
+                0 0 0 #935116,
+                0 2px 2px rgba(0,0,0,0.4);
         }
 
+        /* Neo-Skeuo Gauge */
         .meter-container {
             flex: 1;
             min-width: 280px;
@@ -169,10 +209,10 @@
             width: 200px;
             height: 100px;
             margin: 0 auto 10px auto;
-            background: #e0e0e0;
+            background: #000;
             border-radius: 100px 100px 0 0;
-            box-shadow: inset 0 5px 10px rgba(0,0,0,0.3), 0 2px 2px rgba(255,255,255,0.8);
-            border: 4px solid #bbb;
+            box-shadow: inset 0 10px 20px rgba(0,0,0,1);
+            border: 4px solid #333;
             overflow: hidden;
             display: flex;
             align-items: flex-end;
@@ -182,7 +222,8 @@
         .gauge-background {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 200%;
-            background: conic-gradient(from 270deg at 50% 50%, var(--green) 0deg, var(--green) 60deg, var(--orange) 60deg, var(--orange) 120deg, var(--red) 120deg, var(--red) 180deg, transparent 180deg);
+            /* New logic: Purple (Nominal) -> Pink -> Orange -> Red (Critical) */
+            background: conic-gradient(from 270deg at 50% 50%, var(--neon-purple) 0deg, var(--neon-pink) 60deg, var(--warm-orange) 120deg, var(--critical-red) 180deg, transparent 180deg);
             border-radius: 50%;
         }
 
@@ -191,9 +232,9 @@
             bottom: 0;
             width: 150px;
             height: 75px;
-            background: var(--white);
+            background-color: var(--deep-black);
             border-radius: 75px 75px 0 0;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1), 0 -2px 4px rgba(0,0,0,0.2);
+            box-shadow: inset 0 2px 5px rgba(0,0,0,1), 0 -2px 4px rgba(255,255,255,0.05);
             z-index: 1;
             display: flex;
             align-items: flex-end;
@@ -201,6 +242,8 @@
             padding-bottom: 5px;
             font-weight: bold;
             font-size: 1.2em;
+            border: 2px solid #333;
+            border-bottom: none;
         }
 
         .needle {
@@ -209,13 +252,14 @@
             left: 50%;
             width: 6px;
             height: 90px;
-            background: linear-gradient(to right, #222, #000, #222);
+            /* Black needle with red glow */
+            background: linear-gradient(to right, #000, #333, #000);
             transform-origin: bottom center;
             transform: rotate(0deg);
             transition: transform 1.5s cubic-bezier(0.5, 1, 0.89, 1);
             z-index: 2;
             border-radius: 3px 3px 0 0;
-            box-shadow: 2px 0 3px rgba(0,0,0,0.4);
+            box-shadow: 0 0 10px var(--critical-red);
         }
 
         .needle-screw {
@@ -225,38 +269,39 @@
             transform: translateX(-50%);
             width: 20px;
             height: 20px;
-            background: radial-gradient(circle, #ccc, #888);
+            background: radial-gradient(circle, #333, #000);
             border-radius: 50%;
             z-index: 3;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.5), inset 0 1px 2px rgba(255,255,255,0.8);
-            border: 1px solid #555;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.8), inset 0 1px 2px rgba(255,255,255,0.1);
+            border: 1px solid #000;
         }
 
+        /* LED Screen: Pink/Purple */
         .led-screen {
-            background: #111;
-            background-image: linear-gradient(rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+            background: #000;
+            background-image: linear-gradient(rgba(0, 0, 0, 0) 50%, rgba(255, 105, 180, 0.05) 50%);
             background-size: 100% 4px;
-            color: var(--green);
-            font-family: 'Courier New', Courier, monospace;
+            color: var(--neon-pink);
             padding: 20px;
             border-radius: 8px;
-            box-shadow: inset 0 5px 15px rgba(0,0,0,1), 0 1px 1px rgba(255,255,255,0.4);
-            border: 4px solid #333;
+            box-shadow: inset 0 10px 20px rgba(0,0,0,1);
+            border: 4px solid var(--composite-black);
             min-height: 100px;
             display: flex;
             align-items: center;
-            text-shadow: 0 0 5px var(--green);
-            line-height: 1.4;
+            text-shadow: 0 0 10px var(--neon-pink), 0 0 20px var(--neon-purple);
+            line-height: 1.6;
         }
 
         .status-light {
             display: inline-block;
-            width: 12px;
-            height: 12px;
+            width: 14px;
+            height: 14px;
             border-radius: 50%;
-            background-color: var(--red);
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5), 0 0 8px var(--red);
-            margin-right: 10px;
+            /* Defaults to purple */
+            background-color: var(--neon-purple);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 0 10px var(--neon-purple);
+            margin-right: 12px;
             animation: blink 2s infinite;
         }
 
@@ -265,19 +310,20 @@
             50% { opacity: 0.4; }
         }
 
+        /* News Feed: Brown/Black theme */
         .feed-container {
             max-height: 400px;
             overflow-y: auto;
-            background: #fafafa;
-            border: 1px solid #bbb;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+            background-color: #000;
+            border: 2px solid var(--rich-brown);
+            box-shadow: inset 0 5px 10px rgba(0,0,0,1);
             border-radius: 4px;
             padding: 10px;
         }
 
         .news-item {
-            padding: 12px;
-            border-bottom: 1px dotted #ccc;
+            padding: 15px;
+            border-bottom: 1px dotted var(--rich-brown);
             display: flex;
             flex-direction: column;
             gap: 5px;
@@ -288,31 +334,34 @@
         }
 
         .news-item a {
-            color: #2c6eb5;
+            color: var(--neon-pink);
             text-decoration: none;
             font-weight: bold;
-            font-size: 1.05em;
+            font-size: 1.1em;
+            transition: color 0.2s;
         }
 
         .news-item a:hover {
             text-decoration: underline;
+            color: var(--critical-red);
         }
 
         .news-date {
-            font-size: 0.8em;
-            color: #888;
+            font-size: 0.85em;
+            color: var(--warm-orange);
         }
 
         .loader {
             text-align: center;
             padding: 20px;
             font-style: italic;
-            color: #666;
+            color: var(--neon-purple);
         }
 
+        /* Custom Scrollbar (Brown/Black) */
         ::-webkit-scrollbar { width: 14px; }
-        ::-webkit-scrollbar-track { background: #e0e0e0; border-left: 1px solid #ccc; box-shadow: inset 1px 0 3px rgba(0,0,0,0.1); }
-        ::-webkit-scrollbar-thumb { background: linear-gradient(to right, #ccc, #aaa); border: 1px solid #999; border-radius: 10px; box-shadow: inset 1px 1px 2px rgba(255,255,255,0.8); }
+        ::-webkit-scrollbar-track { background: #000; border-left: 1px solid var(--rich-brown); }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(to right, #333, #111); border: 1px solid var(--rich-brown); border-radius: 10px; }
 
         @media (max-width: 600px) {
             .top-row { flex-direction: column; }
@@ -333,9 +382,9 @@
                     <div class="gauge-background"></div>
                     <div class="needle" id="gauge-needle"></div>
                     <div class="needle-screw"></div>
-                    <div class="gauge-cover" id="gauge-score">CALC...</div>
+                    <div class="gauge-cover" id="gauge-score" style="color: var(--neon-pink);">CALC...</div>
                 </div>
-                <p style="font-size: 0.8em; color: #666;">Quantifies negative terminology in current headlines.</p>
+                <p style="font-size: 0.8em; color: #888;">Quantifies negative terminology in current headlines.</p>
             </div>
 
             <div class="panel control-panel">
@@ -343,13 +392,19 @@
                 <div class="input-group">
                     <label for="topic-input">Target Pathogen / Location / Subject:</label>
                     <input type="text" id="topic-input" placeholder="e.g., flu, COVID, clean water...">
+                    
+                    <div class="skeuo-slider-container">
+                        <label for="time-slider">Max Intel Age: <span id="time-display" style="color: var(--neon-pink); text-shadow: 0 0 5px var(--neon-pink);">30+ Days (All)</span></label>
+                        <input type="range" id="time-slider" min="1" max="30" value="30" class="skeuo-slider">
+                    </div>
+
                     <button id="scan-btn" onclick="triggerScan()">Initiate Scan</button>
                 </div>
             </div>
         </div>
 
-        <div class="panel" style="background: #2a2a2a; border-color: #111;">
-            <div class="panel-title" style="color: #aaa; border-bottom-color: #444; text-shadow: 1px 1px 0 #000;">Main System Synthesis</div>
+        <div class="panel" style="background: var(--composite-black); border-color: #000;">
+            <div class="panel-title" style="color: #aaa; border-bottom-color: #444; text-shadow: none;">Main System Synthesis</div>
             <div class="led-screen">
                 <div>
                     <span class="status-light" id="status-light"></span>
@@ -367,6 +422,7 @@
     </div>
 
     <script>
+        // Init Vanta Background with adjusted colors (Purple/Black theme)
         VANTA.CELLS({
             el: "#vanta-bg",
             mouseControls: true,
@@ -375,11 +431,11 @@
             minHeight: 200.00,
             minWidth: 200.00,
             scale: 1.00,
-            color1: 3559247,
-            color2: 15873333,
+            color1: 0x9b59b6, // neon-purple
+            color2: 0xff69b4, // neon-pink
             size: 1.50,
             speed: 1.00,
-            backgroundColor: 14155663,
+            backgroundColor: 0x0, // deep-black
             backgroundAlpha: 1,
             amplitudeFactor: 1,
             ringFactor: 1,
@@ -388,7 +444,6 @@
         });
 
         const DANGER_KEYWORDS = ['death', 'deaths', 'outbreak', 'crisis', 'pandemic', 'epidemic', 'surge', 'warning', 'alert', 'virus', 'fatal', 'disease', 'emergency', 'risk', 'infected', 'infection'];
-        
         const PROXY_URL = 'https://news-proxy.taylor-martins.workers.dev/?url=';
         
         document.addEventListener('DOMContentLoaded', () => {
@@ -398,6 +453,11 @@
                 if (e.key === 'Enter') {
                     triggerScan();
                 }
+            });
+
+            document.getElementById('time-slider').addEventListener('input', function(e) {
+                const val = e.target.value;
+                document.getElementById('time-display').innerText = val == 30 ? "30+ Days (All)" : val + (val == 1 ? " Day" : " Days");
             });
         });
 
@@ -410,11 +470,11 @@
         async function fetchNews(query) {
             const feedContainer = document.getElementById('news-feed');
             const summaryText = document.getElementById('summary-text');
+            const maxDays = parseInt(document.getElementById('time-slider').value);
             
             feedContainer.innerHTML = '<div class="loader">Scanning global feeds...</div>';
             summaryText.innerText = "Processing telemetry...";
             
-            // ---> SWAPPED TO BING NEWS RSS HERE <---
             const rssUrl = `https://www.bing.com/news/search?q=${encodeURIComponent(query)}&format=rss`;
             
             try {
@@ -422,14 +482,13 @@
                 if (!response.ok) throw new Error('Network response was not ok');
                 
                 const xmlText = await response.text();
-                console.log("Raw Response Data:", xmlText.substring(0, 500));
                 
                 const parser = new DOMParser();
                 const xmlDoc = parser.parseFromString(xmlText, "text/xml");
-                const items = Array.from(xmlDoc.querySelectorAll('item')).slice(0, 15);
+                const items = Array.from(xmlDoc.querySelectorAll('item')).slice(0, 30); 
                 
                 if (items.length === 0) {
-                    feedContainer.innerHTML = '<div class="loader">No critical intelligence found. The data source may have blocked the request. Check console for output.</div>';
+                    feedContainer.innerHTML = '<div class="loader">No critical intelligence found. The data source may have blocked the request.</div>';
                     updateDangerMeter(0);
                     document.getElementById('summary-text').innerText = "NOMINAL STATUS: No significant events detected matching parameters.";
                     return;
@@ -437,22 +496,36 @@
 
                 let htmlContent = '';
                 let headlines = [];
+                let validCount = 0;
+
+                const cutoffDate = new Date();
+                cutoffDate.setDate(cutoffDate.getDate() - maxDays);
 
                 items.forEach(item => {
                     const title = item.querySelector('title').textContent;
                     const link = item.querySelector('link').textContent;
                     const pubDateText = item.querySelector('pubDate') ? item.querySelector('pubDate').textContent : new Date().toLocaleString();
-                    const pubDate = new Date(pubDateText).toLocaleString();
+                    const pubDate = new Date(pubDateText);
                     
+                    if (maxDays < 30 && pubDate < cutoffDate) return; 
+
+                    validCount++;
                     headlines.push(title);
 
                     htmlContent += `
                         <div class="news-item">
                             <a href="${link}" target="_blank">${title}</a>
-                            <span class="news-date">${pubDate}</span>
+                            <span class="news-date">${pubDate.toLocaleString()}</span>
                         </div>
                     `;
                 });
+
+                if (validCount === 0) {
+                    feedContainer.innerHTML = `<div class="loader">No intelligence found within the last ${maxDays} days. Adjust timeframe slider.</div>`;
+                    updateDangerMeter(0);
+                    document.getElementById('summary-text').innerText = "NOMINAL STATUS: No recent events detected in specified timeframe.";
+                    return;
+                }
 
                 feedContainer.innerHTML = htmlContent;
 
@@ -462,7 +535,7 @@
 
             } catch (error) {
                 console.error("Error fetching news:", error);
-                feedContainer.innerHTML = '<div class="loader" style="color: var(--red);">Error connecting to personal secure proxy. Check Cloudflare Worker setup.</div>';
+                feedContainer.innerHTML = '<div class="loader" style="color: var(--critical-red);">Error connecting to personal secure proxy. Check Cloudflare Worker setup.</div>';
                 summaryText.innerText = "SYSTEM ERROR. OFFLINE.";
             }
         }
@@ -479,7 +552,7 @@
                 }
             });
 
-            let dangerScore = Math.floor((keywordCount / 15) * 100);
+            let dangerScore = Math.floor((keywordCount / Math.max(headlines.length, 5)) * 100);
             if (dangerScore > 100) dangerScore = 100;
             if (dangerScore < 5) dangerScore = Math.floor(Math.random() * 10) + 5;
             
@@ -489,21 +562,25 @@
         function updateDangerMeter(score) {
             const gaugeNeedle = document.getElementById('gauge-needle');
             const gaugeScore = document.getElementById('gauge-score');
+            const statusLight = document.getElementById('status-light');
             
             const degrees = (score / 100) * 180;
             gaugeNeedle.style.transform = `rotate(${degrees}deg)`;
             gaugeScore.innerText = `LVL: ${score}`;
 
-            const statusLight = document.getElementById('status-light');
+            // New logic: Purple (Safe) -> Pink -> Orange -> Red (Danger)
             if (score < 40) {
-                statusLight.style.backgroundColor = 'var(--green)';
-                statusLight.style.boxShadow = 'inset 0 2px 4px rgba(0,0,0,0.5), 0 0 8px var(--green)';
-            } else if (score < 75) {
-                statusLight.style.backgroundColor = 'var(--orange)';
-                statusLight.style.boxShadow = 'inset 0 2px 4px rgba(0,0,0,0.5), 0 0 8px var(--orange)';
+                statusLight.style.backgroundColor = 'var(--neon-purple)';
+                statusLight.style.boxShadow = 'inset 0 2px 4px rgba(0,0,0,0.8), 0 0 10px var(--neon-purple)';
+            } else if (score < 60) {
+                statusLight.style.backgroundColor = 'var(--neon-pink)';
+                statusLight.style.boxShadow = 'inset 0 2px 4px rgba(0,0,0,0.8), 0 0 10px var(--neon-pink)';
+            } else if (score < 80) {
+                statusLight.style.backgroundColor = 'var(--warm-orange)';
+                statusLight.style.boxShadow = 'inset 0 2px 4px rgba(0,0,0,0.8), 0 0 10px var(--warm-orange)';
             } else {
-                statusLight.style.backgroundColor = 'var(--red)';
-                statusLight.style.boxShadow = 'inset 0 2px 4px rgba(0,0,0,0.5), 0 0 8px var(--red)';
+                statusLight.style.backgroundColor = 'var(--critical-red)';
+                statusLight.style.boxShadow = 'inset 0 2px 4px rgba(0,0,0,0.8), 0 0 10px var(--critical-red)';
             }
         }
 
@@ -512,9 +589,9 @@
             const topHeadline = headlines[0].split(' - ')[0]; 
             let synthesis = "";
 
-            if (dangerLevel > 75) {
-                synthesis += "CRITICAL ALERT: High volume of concerning terminology detected in global feeds. ";
-            } else if (dangerLevel > 40) {
+            if (dangerLevel > 80) {
+                synthesis += "CRITICAL ALERT: High volume of concerning terminology detected. ";
+            } else if (dangerLevel > 50) {
                 synthesis += "ELEVATED WATCH: Monitoring ongoing developments. ";
             } else {
                 synthesis += "NOMINAL STATUS: Baseline public health reporting levels. ";
