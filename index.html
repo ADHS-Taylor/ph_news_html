@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Public Health News Terminal</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.cells.min.js"></script>
+
     <style>
         /* CSS Variables for Palette */
         :root {
@@ -12,11 +16,6 @@
             --orange: #F0AD4E;
             --white: #F8F9FA;
             --black: #1E1E1E;
-            --bg-texture: radial-gradient(circle, #3a3a3a 10%, transparent 11%), 
-                          radial-gradient(circle at bottom left, #3a3a3a 5%, transparent 6%), 
-                          radial-gradient(circle at bottom right, #3a3a3a 5%, transparent 6%), 
-                          radial-gradient(circle at top left, #3a3a3a 5%, transparent 6%), 
-                          radial-gradient(circle at top right, #3a3a3a 5%, transparent 6%);
         }
 
         * {
@@ -25,21 +24,30 @@
             padding: 0;
         }
 
+        /* The Vanta background container */
+        #vanta-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1; /* Puts it behind everything else */
+        }
+
         body {
-            background-color: var(--black);
-            background-image: var(--bg-texture);
-            background-size: 15px 15px;
+            /* Removed the old CSS texture, Vanta handles the background now */
             color: var(--black);
             font-family: 'Helvetica Neue', Arial, sans-serif;
             display: flex;
             justify-content: center;
             padding: 20px;
+            min-height: 100vh;
         }
 
         .dashboard {
             width: 100%;
             max-width: 900px;
-            background: linear-gradient(to bottom, #ececec, #d4d4d4);
+            background: linear-gradient(to bottom, rgba(236, 236, 236, 0.95), rgba(212, 212, 212, 0.95)); /* Made slightly transparent to show background */
             border-radius: 12px;
             padding: 20px;
             box-shadow: 
@@ -47,6 +55,7 @@
                 0 10px 30px rgba(0, 0, 0, 0.8),
                 0 2px 5px rgba(0,0,0,0.5);
             border: 2px solid #999;
+            backdrop-filter: blur(5px); /* Adds a cool frosted glass effect over the cells */
         }
 
         h1 {
@@ -322,6 +331,8 @@
 </head>
 <body>
 
+    <div id="vanta-bg"></div>
+
     <div class="dashboard">
         <h1>Public Health Terminal</h1>
 
@@ -366,6 +377,27 @@
     </div>
 
     <script>
+        // --- Initialize Vanta.js Background using your specific parameters ---
+        VANTA.CELLS({
+            el: "#vanta-bg",
+            mouseControls: true,
+            touchControls: true,
+            gyroControls: false,
+            minHeight: 200.00,
+            minWidth: 200.00,
+            scale: 1.00,
+            color1: 3559247,
+            color2: 15873333,
+            size: 1.50,
+            speed: 1.00,
+            backgroundColor: 14155663,
+            backgroundAlpha: 1,
+            amplitudeFactor: 1,
+            ringFactor: 1,
+            rotationFactor: 1,
+            scaleMobile: 3.00
+        });
+
         // Constants and State
         const DANGER_KEYWORDS = ['death', 'deaths', 'outbreak', 'crisis', 'pandemic', 'epidemic', 'surge', 'warning', 'alert', 'virus', 'fatal', 'disease', 'emergency', 'risk', 'infected', 'infection'];
         
@@ -409,12 +441,13 @@
                 const xmlDoc = parser.parseFromString(xmlText, "text/xml");
                 const items = Array.from(xmlDoc.querySelectorAll('item')).slice(0, 15);
                 
+                // FIXED BUG HERE: Replaced undefined updateSummary with direct DOM update
                 if (items.length === 0) {
-    feedContainer.innerHTML = '<div class="loader">No critical intelligence found for this query (or proxy returned invalid XML).</div>';
-    updateDangerMeter(0);
-    document.getElementById('summary-text').innerText = "NOMINAL STATUS: No significant public health events detected matching parameters.";
-    return;
-}
+                    feedContainer.innerHTML = '<div class="loader">No critical intelligence found for this query (or proxy returned invalid XML).</div>';
+                    updateDangerMeter(0);
+                    document.getElementById('summary-text').innerText = "NOMINAL STATUS: No significant public health events detected matching parameters.";
+                    return;
+                }
 
                 let htmlContent = '';
                 let headlines = [];
