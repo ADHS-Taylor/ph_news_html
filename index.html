@@ -310,7 +310,7 @@
             color: #666;
         }
 
-        /* Scrollbar Styling for skeuomorphic feel */
+        /* Scrollbar Styling */
         ::-webkit-scrollbar { width: 14px; }
         ::-webkit-scrollbar-track { background: #e0e0e0; border-left: 1px solid #ccc; box-shadow: inset 1px 0 3px rgba(0,0,0,0.1); }
         ::-webkit-scrollbar-thumb { background: linear-gradient(to right, #ccc, #aaa); border: 1px solid #999; border-radius: 10px; box-shadow: inset 1px 1px 2px rgba(255,255,255,0.8); }
@@ -368,12 +368,14 @@
     <script>
         // Constants and State
         const DANGER_KEYWORDS = ['death', 'deaths', 'outbreak', 'crisis', 'pandemic', 'epidemic', 'surge', 'warning', 'alert', 'virus', 'fatal', 'disease', 'emergency', 'risk', 'infected', 'infection'];
-        const PROXY_URL = 'https://corsproxy.io/?';
+        
+        // --- REPLACE THIS URL WITH YOUR NEW CLOUDFLARE WORKER URL ---
+        // Ensure you keep the "/?url=" parameter at the very end!
+        const PROXY_URL = 'https://news-proxy.taylor-martins.workers.dev/?url=';
         
         document.addEventListener('DOMContentLoaded', () => {
-            fetchNews('public health'); // Default scan on load
+            fetchNews('public health');
             
-            // Allow 'Enter' key to trigger scan
             document.getElementById('topic-input').addEventListener('keypress', function (e) {
                 if (e.key === 'Enter') {
                     triggerScan();
@@ -390,27 +392,22 @@
         async function fetchNews(query) {
             const feedContainer = document.getElementById('news-feed');
             const summaryText = document.getElementById('summary-text');
-            const gaugeNeedle = document.getElementById('gauge-needle');
-            const gaugeScore = document.getElementById('gauge-score');
             
             feedContainer.innerHTML = '<div class="loader">Scanning global feeds...</div>';
             summaryText.innerText = "Processing telemetry...";
             
-            // Format Google News RSS URL
             const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=en-US&gl=US&ceid=US:en`;
             
             try {
-                // Fetch using corsproxy.io
+                // We pass the URL into our own Cloudflare proxy!
                 const response = await fetch(PROXY_URL + encodeURIComponent(rssUrl));
                 if (!response.ok) throw new Error('Network response was not ok');
                 
-                // Read the response as raw text instead of JSON
                 const xmlText = await response.text();
                 
-                // Parse XML
                 const parser = new DOMParser();
                 const xmlDoc = parser.parseFromString(xmlText, "text/xml");
-                const items = Array.from(xmlDoc.querySelectorAll('item')).slice(0, 15); // Get top 15
+                const items = Array.from(xmlDoc.querySelectorAll('item')).slice(0, 15);
                 
                 if (items.length === 0) {
                     feedContainer.innerHTML = '<div class="loader">No critical intelligence found for this query.</div>';
@@ -439,14 +436,13 @@
 
                 feedContainer.innerHTML = htmlContent;
 
-                // Analytics
                 const dangerLevel = calculateDangerLevel(headlines);
                 updateDangerMeter(dangerLevel);
                 generateSynthesis(headlines, dangerLevel);
 
             } catch (error) {
                 console.error("Error fetching news:", error);
-                feedContainer.innerHTML = '<div class="loader" style="color: var(--red);">Error connecting to remote databanks. Proxy may be unresponsive.</div>';
+                feedContainer.innerHTML = '<div class="loader" style="color: var(--red);">Error connecting to personal secure proxy. Check Cloudflare Worker setup.</div>';
                 summaryText.innerText = "SYSTEM ERROR. OFFLINE.";
             }
         }
@@ -456,7 +452,6 @@
             const combinedText = headlines.join(' ').toLowerCase();
             
             DANGER_KEYWORDS.forEach(keyword => {
-                // Count occurrences of keywords
                 const regex = new RegExp('\\b' + keyword + '\\b', 'g');
                 const matches = combinedText.match(regex);
                 if (matches) {
@@ -464,10 +459,9 @@
                 }
             });
 
-            // Normalize: Let's assume ~15 keywords across 15 headlines is max danger (100)
             let dangerScore = Math.floor((keywordCount / 15) * 100);
             if (dangerScore > 100) dangerScore = 100;
-            if (dangerScore < 5) dangerScore = Math.floor(Math.random() * 10) + 5; // Ambient background noise
+            if (dangerScore < 5) dangerScore = Math.floor(Math.random() * 10) + 5;
             
             return dangerScore;
         }
@@ -476,12 +470,10 @@
             const gaugeNeedle = document.getElementById('gauge-needle');
             const gaugeScore = document.getElementById('gauge-score');
             
-            // Map 0-100 to 0-180 degrees
             const degrees = (score / 100) * 180;
             gaugeNeedle.style.transform = `rotate(${degrees}deg)`;
             gaugeScore.innerText = `LVL: ${score}`;
 
-            // Update LED status light color based on danger
             const statusLight = document.getElementById('status-light');
             if (score < 40) {
                 statusLight.style.backgroundColor = 'var(--green)';
@@ -497,9 +489,7 @@
 
         function generateSynthesis(headlines, dangerLevel) {
             const summaryText = document.getElementById('summary-text');
-            
-            // Create a fake NLP summary by extracting main themes
-            const topHeadline = headlines[0].split(' - ')[0]; // Remove source suffix
+            const topHeadline = headlines[0].split(' - ')[0]; 
             let synthesis = "";
 
             if (dangerLevel > 75) {
@@ -512,7 +502,6 @@
 
             synthesis += `Primary focal point: "${topHeadline}". Advise reviewing live intel feed below for specifics.`;
             
-            // Typewriter effect for LED screen
             summaryText.innerText = '';
             let i = 0;
             function typeWriter() {
