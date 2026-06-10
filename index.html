@@ -9,7 +9,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.cells.min.js"></script>
 
     <style>
-        /* CSS Variables for Palette */
         :root {
             --red: #D9534F;
             --green: #5CB85C;
@@ -24,7 +23,6 @@
             padding: 0;
         }
 
-        /* The Vanta background container */
         #vanta-bg {
             position: fixed;
             top: 0;
@@ -67,7 +65,6 @@
             letter-spacing: 2px;
         }
 
-        /* Skeuomorphic Panels */
         .panel {
             background: var(--white);
             border-radius: 8px;
@@ -91,7 +88,6 @@
             padding-bottom: 5px;
         }
 
-        /* Top Section: Meter and Filter */
         .top-row {
             display: flex;
             gap: 20px;
@@ -106,7 +102,6 @@
             justify-content: center;
         }
 
-        /* Skeuomorphic Inputs and Buttons */
         .input-group {
             display: flex;
             flex-direction: column;
@@ -163,7 +158,6 @@
                 0 2px 2px rgba(0,0,0,0.2);
         }
 
-        /* Danger Meter Gauge */
         .meter-container {
             flex: 1;
             min-width: 280px;
@@ -238,7 +232,6 @@
             border: 1px solid #555;
         }
 
-        /* LED Screen for Summary */
         .led-screen {
             background: #111;
             background-image: linear-gradient(rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
@@ -272,7 +265,6 @@
             50% { opacity: 0.4; }
         }
 
-        /* News Feed Feed */
         .feed-container {
             max-height: 400px;
             overflow-y: auto;
@@ -318,7 +310,6 @@
             color: #666;
         }
 
-        /* Scrollbar Styling */
         ::-webkit-scrollbar { width: 14px; }
         ::-webkit-scrollbar-track { background: #e0e0e0; border-left: 1px solid #ccc; box-shadow: inset 1px 0 3px rgba(0,0,0,0.1); }
         ::-webkit-scrollbar-thumb { background: linear-gradient(to right, #ccc, #aaa); border: 1px solid #999; border-radius: 10px; box-shadow: inset 1px 1px 2px rgba(255,255,255,0.8); }
@@ -376,7 +367,6 @@
     </div>
 
     <script>
-        // --- Initialize Vanta.js Background ---
         VANTA.CELLS({
             el: "#vanta-bg",
             mouseControls: true,
@@ -399,7 +389,6 @@
 
         const DANGER_KEYWORDS = ['death', 'deaths', 'outbreak', 'crisis', 'pandemic', 'epidemic', 'surge', 'warning', 'alert', 'virus', 'fatal', 'disease', 'emergency', 'risk', 'infected', 'infection'];
         
-        // --- YOUR CLOUDFLARE WORKER URL ---
         const PROXY_URL = 'https://news-proxy.taylor-martins.workers.dev/?url=';
         
         document.addEventListener('DOMContentLoaded', () => {
@@ -425,16 +414,14 @@
             feedContainer.innerHTML = '<div class="loader">Scanning global feeds...</div>';
             summaryText.innerText = "Processing telemetry...";
             
-            // ---> YAHOO NEWS RSS FEED <---
-            const rssUrl = `https://news.search.yahoo.com/rss?p=${encodeURIComponent(query)}`;
+            // ---> SWAPPED TO BING NEWS RSS HERE <---
+            const rssUrl = `https://www.bing.com/news/search?q=${encodeURIComponent(query)}&format=rss`;
             
             try {
                 const response = await fetch(PROXY_URL + encodeURIComponent(rssUrl));
                 if (!response.ok) throw new Error('Network response was not ok');
                 
                 const xmlText = await response.text();
-                
-                // Logging raw response to console for debugging just in case
                 console.log("Raw Response Data:", xmlText.substring(0, 500));
                 
                 const parser = new DOMParser();
@@ -442,9 +429,9 @@
                 const items = Array.from(xmlDoc.querySelectorAll('item')).slice(0, 15);
                 
                 if (items.length === 0) {
-                    feedContainer.innerHTML = '<div class="loader">No critical intelligence found for this query. If proxy is working, Yahoo may be blocking the request. Check console for output.</div>';
+                    feedContainer.innerHTML = '<div class="loader">No critical intelligence found. The data source may have blocked the request. Check console for output.</div>';
                     updateDangerMeter(0);
-                    document.getElementById('summary-text').innerText = "NOMINAL STATUS: No significant public health events detected matching parameters.";
+                    document.getElementById('summary-text').innerText = "NOMINAL STATUS: No significant events detected matching parameters.";
                     return;
                 }
 
@@ -454,7 +441,6 @@
                 items.forEach(item => {
                     const title = item.querySelector('title').textContent;
                     const link = item.querySelector('link').textContent;
-                    // Yahoo uses pubDate but we provide a fallback just in case
                     const pubDateText = item.querySelector('pubDate') ? item.querySelector('pubDate').textContent : new Date().toLocaleString();
                     const pubDate = new Date(pubDateText).toLocaleString();
                     
