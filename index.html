@@ -416,7 +416,7 @@
             feedContainer.innerHTML = '<div class="loader">Scanning global feeds...</div>';
             summaryText.innerText = "Processing telemetry...";
             
-            const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=en-US&gl=US&ceid=US:en`;
+            const rssUrl = `https://news.search.yahoo.com/rss?p=${encodeURIComponent(query)}`;
             
             try {
                 const response = await fetch(PROXY_URL + encodeURIComponent(rssUrl));
