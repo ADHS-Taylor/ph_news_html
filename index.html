@@ -209,7 +209,7 @@
             height: 90px;
             background: linear-gradient(to right, #222, #000, #222);
             transform-origin: bottom center;
-            transform: rotate(0deg); /* 0 to 180deg */
+            transform: rotate(0deg);
             transition: transform 1.5s cubic-bezier(0.5, 1, 0.89, 1);
             z-index: 2;
             border-radius: 3px 3px 0 0;
@@ -368,7 +368,7 @@
     <script>
         // Constants and State
         const DANGER_KEYWORDS = ['death', 'deaths', 'outbreak', 'crisis', 'pandemic', 'epidemic', 'surge', 'warning', 'alert', 'virus', 'fatal', 'disease', 'emergency', 'risk', 'infected', 'infection'];
-        const PROXY_URL = 'https://api.allorigins.win/get?url=';
+        const PROXY_URL = 'https://corsproxy.io/?';
         
         document.addEventListener('DOMContentLoaded', () => {
             fetchNews('public health'); // Default scan on load
@@ -400,13 +400,16 @@
             const rssUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=en-US&gl=US&ceid=US:en`;
             
             try {
+                // Fetch using corsproxy.io
                 const response = await fetch(PROXY_URL + encodeURIComponent(rssUrl));
                 if (!response.ok) throw new Error('Network response was not ok');
-                const data = await response.json();
+                
+                // Read the response as raw text instead of JSON
+                const xmlText = await response.text();
                 
                 // Parse XML
                 const parser = new DOMParser();
-                const xmlDoc = parser.parseFromString(data.contents, "text/xml");
+                const xmlDoc = parser.parseFromString(xmlText, "text/xml");
                 const items = Array.from(xmlDoc.querySelectorAll('item')).slice(0, 15); // Get top 15
                 
                 if (items.length === 0) {
@@ -443,7 +446,7 @@
 
             } catch (error) {
                 console.error("Error fetching news:", error);
-                feedContainer.innerHTML = '<div class="loader" style="color: var(--red);">Error connecting to remote databanks. CORS proxy may be unresponsive.</div>';
+                feedContainer.innerHTML = '<div class="loader" style="color: var(--red);">Error connecting to remote databanks. Proxy may be unresponsive.</div>';
                 summaryText.innerText = "SYSTEM ERROR. OFFLINE.";
             }
         }
